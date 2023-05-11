@@ -22,6 +22,8 @@ class Combiner:
         solutions = []
         orig_letters = dict(Counter(word))
         for w in variants:
+            if w == self.word:
+                continue
             # at this step we remove all words that either bigger or has letters that don't present in original word
             if len(w) > len(word) or len(set(w) - orig_letters.keys()) != 0:
                 continue
@@ -57,6 +59,6 @@ class Combiner:
 
 if __name__ == "__main__":
     c = Combiner("russian_nouns.txt")
-    c.set_word(rnd=True)
+    c.set_word(word="качели")
     while True:
         c.guess(input("Your word: "))
