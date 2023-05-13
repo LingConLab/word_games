@@ -53,12 +53,14 @@ class Combiner:
                 print("You won!")
                 return
             print(f"Yes! {len(self.solutions)} more")
+            return True
         else:
             print(f"Lol there is no {word} in {self.word}")
+        return False
 
 
 if __name__ == "__main__":
     c = Combiner("russian_nouns.txt")
-    c.set_word(word="качели")
+    c.set_word(word="лол")
     while True:
         c.guess(input("Your word: "))
