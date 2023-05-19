@@ -1,8 +1,8 @@
 from collections import Counter
 import random
+from games.Games import Game
 
-
-class Combiner:
+class Combiner(Game):
     def __init__(self, path: str) -> None:
         with open(path, 'r', encoding="utf-8") as f:
             self.dictionary = set(f.read().split('\n'))

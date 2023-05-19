@@ -1,0 +1,12 @@
+<p><b>Загаданное слово: </b>
+<p style="color: brown;">{{ guessed_word }}</p>
+</h1>
+<form action="" method="post">
+    <input type="text" name="guess" id="guess" required>
+    {% if guessed == 1 %}
+    <p>Yeah! there are some more!</p>
+    {% else %}
+    <p>no, there no any word like that</p>
+    {% endif %}
+    <button type="submit">Check</button>
+</form>
