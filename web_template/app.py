@@ -1,15 +1,20 @@
 from flask import Flask
 from flask import request
 from flask.templating import render_template
-from games.Games import *
+from Games import *
 
 
 game = "GAME_MASK"
 
+game.start_game()
+
 @app.route('/', methods=['post', 'get'])
 @app.route('/home', methods=['post', 'get'])
 def home():
-    return render_template('base.html')
+    if request.method == "POST":
+        input_word = request.form.get("guess")
+        return game.make_move(input_word)
+    return render_template('base.html', guessed_word=game.word)
 
 
 @app.route('/game', methods=['post', 'get'])

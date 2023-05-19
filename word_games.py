@@ -1,6 +1,6 @@
 import markdown
 import re
-from web_template.games.Games import *
+from web_template.Games import *
 import os
 import shutil
 
@@ -33,11 +33,6 @@ class Project:
                                 
                                 <!-- Заголовок страницы -->
                                 <title>{% block title %}{% endblock %}</title>
-                                
-                                <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favic.png') }}">
-                                <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
-                                <link href="https://fonts.googleapis.com/css?family=Lora:400,700&display=swap" rel="stylesheet" type="text/css" />
-
                             </head>
                             <body>""")
                 h.write(html_text)
@@ -52,8 +47,8 @@ class Project:
                           game[1]+f'("{self.dict_path}")', code)
             new.write(code)
 
-        shutil.copy("web_template/games/Games.py",
-                    f"{web_path}/games/Games.py")
+        shutil.copy("web_template/Games.py",
+                    f"{web_path}/Games.py")
 
     def __parse_games(self, text):
         games_dict = {

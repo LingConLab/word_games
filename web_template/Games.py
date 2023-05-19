@@ -52,7 +52,7 @@ class Combiner(Game):
 
     def start_game(self):
         super().start_game()
-        super().set_word(word="TEST")
+        super().set_word(rnd=True)
         print(f"Selected word is {self.word}")
         self.solutions = self.__find_solutions(self.word)
 
