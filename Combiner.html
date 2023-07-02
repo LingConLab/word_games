@@ -1,18 +1,25 @@
 <!DOCTYPE html>
-
 <head>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.8.9/brython.min.js">
-    </script>
-
+    <script type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/brython@3.11/brython.min.js">
+</script>
+<script type="text/javascript"
+    src="https://cdn.jsdelivr.net/npm/brython@3.11/brython_stdlib.js">
+</script>
 </head>
-Активируем его при загрузке страницы
-
 <body onload="brython()">
+    <div id="fileContents">
+        
+    </div>
+
     <script type="text/python">
         from browser import document
-        
-        document <= "Hello World"
+        import time
+        #t = open("requirements.txt").read()
+        document['fileContents'] <= open('requirements.txt').readlines()
+        print("hi")
+        #document["fileContents"] <= "Hello"
+    
         </script>
 </body>
-
 </html>
