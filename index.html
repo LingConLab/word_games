@@ -58,7 +58,7 @@ class Combiner:
             foreign_letters
             w = w.strip('\r')
             #print(str(len(foreign_letters)) +' vs. ' + str(len(set(orig_letters.keys()))))
-            if len(w) > len(word) or len(foreign_letters - set(orig_letters.keys())) > 1:
+            if len(w) > len(word) or len(foreign_letters - set(orig_letters.keys())) > 0:
                 continue
             #print(len(w) > len(word))
             #print(foreign_letters, orig_letters.keys())
