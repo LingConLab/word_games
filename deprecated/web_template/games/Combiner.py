@@ -1,8 +1,8 @@
 from collections import Counter
 import random
-from games.Games import Game
 
-class Combiner(Game):
+
+class Combiner:
     def __init__(self, path: str) -> None:
         with open(path, 'r', encoding="utf-8") as f:
             self.dictionary = set(f.read().split('\n'))
@@ -61,6 +61,6 @@ class Combiner(Game):
 
 if __name__ == "__main__":
     c = Combiner("russian_nouns.txt")
-    c.set_word(word="лол")
+    c.set_word(word="патриот")
     while True:
         c.guess(input("Your word: "))

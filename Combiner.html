@@ -2,23 +2,106 @@
 <head>
     <script type="text/javascript"
     src="https://cdn.jsdelivr.net/npm/brython@3.11/brython.min.js">
-</script>
-<script type="text/javascript"
-    src="https://cdn.jsdelivr.net/npm/brython@3.11/brython_stdlib.js">
-</script>
+    </script>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/brython@3.11/brython_stdlib.js">
+    </script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body onload="brython()">
-    <div id="fileContents">
-        
-    </div>
 
+    <p class="welcomeText">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc fermentum et elit vestibulum sollicitudin. Sed non est elementum, luctus neque vel, tincidunt augue. Nulla rhoncus elit vel dapibus tempus. In vel metus vitae enim ultrices vehicula vitae sed neque. Etiam auctor, tellus nec condimentum viverra, felis quam pulvinar mauris, sit amet rhoncus ante ipsum at nulla. Nunc ornare condimentum tristique. In ac tristique metus, et interdum lacus. Aenean rhoncus euismod sapien nec scelerisque. Cras eu facilisis libero, id placerat leo. Nulla convallis justo mi, sed porttitor orci pulvinar eu. Aliquam vitae ullamcorper nulla, non convallis magna. Integer est lacus, fermentum vel sodales in, convallis non felis. Vestibulum at enim velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
+        
+        Maecenas ut aliquam quam. Integer egestas eleifend hendrerit. Nam sollicitudin in nunc non vehicula. Donec vestibulum purus ligula, eu ultricies eros feugiat a. Integer mollis, urna sed venenatis hendrerit, mi elit tempus diam, et tempus mauris turpis a velit. Sed porttitor augue id magna pretium, sit amet tempus augue euismod. Etiam vitae nisi orci. Donec ultrices congue neque, nec congue metus auctor sed. Nam nec lorem non sapien condimentum condimentum. Pellentesque id tempor lacus. Aliquam posuere nisi a gravida vehicula. Fusce eget eros quis arcu venenatis commodo in id massa. Sed malesuada sed orci vitae dictum.
+    <div id="gameContent" class="game">
+        <p id="word" class="wordMain"></p>
+        <textarea id="textInput" class="textInput"></textarea>
+        <button id="checkButton" class="checkButton">Check</button>
+        <p><p id="wordCount"></p> Found words: </p>
+    </div>
     <script type="text/python">
-        from browser import document
-        import time
-        #t = open("requirements.txt").read()
-        document['fileContents'] <= open('requirements.txt').readlines()
-        print("hi")
-        #document["fileContents"] <= "Hello"
+from browser import document
+from collections import Counter
+import random
+
+
+class Combiner:
+    def __init__(self, path: str) -> None:
+        with open(path, 'r', encoding="utf-8") as f:
+            self.dictionary = set(f.read().split('\n'))
+            self.word = "WORD"
+            self.solutions = set()
+            self.base_solutions = 0
+
+    def find_solutions(self, word='') -> list[str]:
+        """
+        Takes a word as an input and finds all the words that can be combined from the letters of the original word.
+        Example: `"шинель" -> ["лень", "лен", "нил", "лишь"]`
+        """
+
+        if not word:
+            word = self.word
+
+        variants: list[str] = self.dictionary
+        solutions = []
+        x = dict(Counter(word))
+        if '\r' in x:
+            x.pop('\r')
+        orig_letters = x
+        #print(orig_letters)
+        for w in variants:
+            if w == self.word:
+                continue
+            # at this step we remove all words that either bigger or has letters that don't present in original word
+            foreign_letters = set(w)
+            foreign_letters
+            w = w.strip('\r')
+            #print(str(len(foreign_letters)) +' vs. ' + str(len(set(orig_letters.keys()))))
+            if len(w) > len(word) or len(foreign_letters - set(orig_letters.keys())) > 1:
+                continue
+            #print(len(w) > len(word))
+            #print(foreign_letters, orig_letters.keys())
+
+            #print("Current variant:", w)
+            
+            for letter in dict(Counter(w)):
+                if orig_letters[letter] - dict(Counter(w))[letter] < 0:
+                    break
+            else:
+                solutions.append(w)
+
+        self.base_solutions = len(solutions)
+        return solutions
+
+    def set_word(self, word="", rnd=False) -> None:
+        if rnd:
+            self.word = random.choice(list(self.dictionary))
+        else:
+            self.word = word
+        print(f"Selected word is {self.word}")
+        self.solutions = self.find_solutions()
+        print(self.solutions)
+        print(f"There are {len(self.solutions)} solutions")
+
+    def guess(self, word):
+        word = str(document['textInput'].value)
+        if word in self.solutions:
+            self.solutions.remove(word)
+            if len(self.solutions) == 0:
+                print("You won!")
+                return
+            print(f"Yes! {len(self.solutions)} more")
+            document["wordCount"] <= f"{len(self.solutions)}/{self.base_solutions}"
+            return True
+        else:
+            print(f"Lol there is no {word} in {self.word}")
+        return False
+
+c = Combiner("russian_nouns.txt")
+c.set_word(rnd=True)
+document["word"] <= c.word
+document["checkButton"].bind("click", c.guess)
     
         </script>
 </body>
