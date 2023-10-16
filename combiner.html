@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3/brython.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js">
+    </script>
+    <style>
+        .game {
+        margin-left: 20%;
+        margin-right: 20%;
+        }
+
+        .welcomeText {
+            text-align: center;
+        }
+
+
+        .wordMain {
+            font-size: xx-large;
+            letter-spacing: 5px;
+            text-align: center;
+        }
+
+        .textInput {
+            padding-left: 30%;
+            padding-right: 30%;
+            width: 40%;
+        }
+
+        .checkButton {
+            align-self: center;
+        }
+    </style>
+</head>
+<body onload="brython()">
+
+    <p class="welcomeText">
+
+    </p>
+        
+    <div id="gameContent" class="game">
+        <p id="word" class="wordMain"></p>
+        <textarea id="textInput" class="textInput"></textarea>
+        <button id="checkButton" class="checkButton">Check</button>
+        <p>Found words: <p id="wordCount"></p> </p>
+        <div>
+            <p id="foundWords"></p>
+        </div>
+    </div>
+    <script type="text/python">
+from browser import document
+from collections import Counter
+import random
+
+
+class Combiner:
+    def __init__(self, path: str) -> None:
+        with open(path, 'r', encoding="utf-8") as f:
+            self.dictionary = set(f.read().split('\n'))
+            self.word = "WORD"
+            self.solutions = set()
+            self.base_solutions = 0
+
+    def find_solutions(self, word='') -> list[str]:
+        """
+        Takes a word as an input and finds all the words that can be combined from the letters of the original word.
+        Example: `"шинель" -> ["лень", "лен", "нил", "лишь"]`
+        """
+
+        if not word:
+            word = self.word
+
+        variants: list[str] = self.dictionary
+        solutions = []
+        x = dict(Counter(word))
+        if '\r' in x:
+            x.pop('\r')
+        orig_letters = x
+        print(orig_letters)
+        for w in variants:
+            if w == self.word:
+                continue
+            # at this step we remove all words that either bigger or has letters that don't present in original word
+            w = w.strip('\r')
+            foreign_letters = set(w)
+            #print(str(len(foreign_letters)) +' vs. ' + str(len(set(orig_letters.keys()))))
+            if len(w) > len(word) or len(foreign_letters - set(orig_letters.keys())) > 0:
+                continue
+            #print(len(w) > len(word))
+            #print(foreign_letters, orig_letters.keys())
+
+            #print("Current variant:", w)
+            
+            for letter in dict(Counter(w)):
+                if orig_letters[letter] - dict(Counter(w))[letter] < 0:
+                    break
+            else:
+                solutions.append(w)
+
+        self.base_solutions = len(solutions)
+        return solutions
+
+    def set_word(self, word="", rnd=False) -> None:
+        if rnd:
+            self.word = random.choice(list(self.dictionary))
+        else:
+            self.word = word
+        print(f"Selected word is {self.word}")
+        self.solutions = self.find_solutions()
+        print(self.solutions)
+        print(f"There are {len(self.solutions)} solutions")
+
+    def guess(self, word):
+        word = str(document['textInput'].value)
+        if word in self.solutions:
+            self.solutions.remove(word)
+            if len(self.solutions) == 0:
+                print("You won!")
+                return
+            print(f"Yes! {len(self.solutions)} more")
+            document["wordCount"].text = f"{len(self.solutions)}/{self.base_solutions}"
+            document["foundWords"] <= word + '\t'
+            return True
+        else:
+            print(f"Lol there is no {word} in {self.word}")
+        return False
+
+c = Combiner("russian_nouns.txt")
+c.set_word(rnd=True)
+document["word"] <= c.word
+document["checkButton"].bind("click", c.guess)
+    
+        </script>
+</body>
+</html>
