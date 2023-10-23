@@ -4,7 +4,7 @@ def wordle(dictionary: str, alphabet: str, size: int, tries: int, direction: str
            victory_outcome: str, lose_outcome: str):
     from jinja2 import Environment, FileSystemLoader
     env = Environment(loader=FileSystemLoader(''))
-    template = env.get_template('wordle_template.html')
+    template = env.get_template('templates/wordle_template.html')
     rendered_template = template.render(dictionary=dictionary, alphabet=alphabet,
                                                   size=size, tries=tries, direction=direction,
                                                   nothing_to_delete_error=nothing_to_delete_error,
@@ -20,7 +20,7 @@ def wordle(dictionary: str, alphabet: str, size: int, tries: int, direction: str
 def combiner(dictionary: str, random_word: bool):
     from jinja2 import Environment, FileSystemLoader
     env = Environment(loader=FileSystemLoader(''))
-    template = env.get_template('combiner_template.html')
+    template = env.get_template('templates/combiner_template.html')
     rendered_template = template.render(dictionary=dictionary, random_word=random_word)
 
     with open("combiner.html", "w", encoding="utf-8") as file:
