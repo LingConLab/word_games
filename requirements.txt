@@ -1,2 +1,1 @@
-flask
-markdown
+jinja2
