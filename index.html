@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/brython@3/brython.min.js">
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js">
+		</script>
+		<link rel="stylesheet" href="styles.css">
+        <style>
+            .correct {
+                background-color: yellowgreen; 
+                color: black;
+            }
+            .partially_correct {
+                background-color: orange; 
+                color: black;
+            }
+            .incorrect {
+                background-color: grey; 
+                color: black;
+            }
+            .cell {
+                width: 40px;
+                height: 40px;
+                text-align: center;
+                font-size: 30px;
+                border: 2px solid black;
+                border-radius: 10px;
+                outline: none;
+            }
+            .row {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+            .button {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+                border-radius: 10px;
+                outline: none;
+            }
+            .buttons {
+                margin-bottom: 0px;
+            }
+            .error {
+                width: 300px;
+                height: 80px;
+                background-color: deeppink;
+            }
+            .lose {
+                width: 300px;
+                height: 180px;
+                background-color: deeppink;
+            }
+            .victory {
+                width: 300px;
+                height: 180px;
+                background-color: yellowgreen;
+            }
+            .appearence {
+                display: flex;
+                top: 15%;
+                left: 15%;
+                margin-bottom: 10px;
+                position: absolute;
+                z-index: 9999;
+            }
+        </style>
+	</head>
+	<body onload="brython()">
+		<script type="text/python">
+            from browser import document, html, timer
+            import random
+            from csv import reader
+
+
+            class Wordle:
+                def __init__(self, dictionary: str, alphabet: str, size: int, tries: int, direction: str,
+                             nothing_to_delete_error: str, no_word_in_dictionary_error: str,
+                             word_is_too_short_error: str, word_is_too_long_error: str,
+                             victory_outcome: str, lose_outcome: str) -> None:
+                    self.size = size
+                    self.tries = tries
+                    self.direction = direction
+                    self.errors = dict((k, v) for k, v in locals().items() if '_error' in k)
+                    self.outcomes = dict((k, v) for k, v in locals().items() if '_outcome' in k)
+                    
+                    with open(dictionary, 'r', encoding="utf-8") as file:
+                        self.dictionary = []
+                        for word in reader(file):
+                            if len(word[0]) == self.size:
+                                self.dictionary.append(word[0].lower())
+
+                        self.hidden_word = random.choice(self.dictionary)
+                        print(self.hidden_word)
+
+                    with open(alphabet, 'r', encoding="utf-8") as file:
+                        self.alphabet = []
+                        for line in reader(file):
+                            self.alphabet.append(line[0])
+
+                    self.guesses = [""]
+                    self.letters = {"incorrect_letters": [],
+                                    "partially_correct_letters": [],
+                                    "correct_letters": []}
+                    self.error = ""
+                    self.outcome = ""
+                    
+                    self.spawn_page()
+
+                def clean_error(self):
+                    self.error = ""
+                    self.spawn_page()
+
+                def spawn_page(self):
+                    document.clear()
+                    document <= html.H1("Wordle Game", Class="name", style="text-align: center;")
+                    rows = []
+                    for tr in range(self.tries):
+                        row = []
+                        for s in range(self.size):
+                            if tr < len(self.guesses) - 1:
+                                try:
+                                    if self.guesses[tr][s] not in self.hidden_word:
+                                        row.append(html.DIV(self.guesses[tr][s], Class="incorrect cell"))
+                                    elif self.guesses[tr][s] in self.hidden_word and not self.guesses[tr][s] == self.hidden_word[s]:
+                                        row.append(html.DIV(self.guesses[tr][s], Class="partially_correct cell"))
+                                    elif self.guesses[tr][s] == self.hidden_word[s]:
+                                        row.append(html.DIV(self.guesses[tr][s], Class="correct cell"))
+                                except IndexError:
+                                    row.append(html.DIV(Class="cell"))
+                            else:
+                                try:
+                                    row.append(html.DIV(self.guesses[tr][s], Class="cell"))
+                                except IndexError:
+                                    row.append(html.DIV(Class="cell"))
+                        if self.direction == "left_to_right":
+                            pass
+                        elif self.direction == "right_to_left":
+                            row = row[::-1]
+                        rows.append(html.DIV(row, Class="row"))
+                    document <= html.DIV(rows, Class="rows")
+                    
+                    keyboard_rows = []
+                    for n, row in enumerate(self.alphabet):
+                        keyboard_row = []
+                        for letter in row:
+                            if letter in self.letters["incorrect_letters"]:
+                                keyboard_row.append(html.BUTTON(letter, Class="incorrect button", Id="Letter", value=letter))
+                            elif letter in self.letters["partially_correct_letters"]:
+                                keyboard_row.append(html.BUTTON(letter, Class="partially_correct button", Id="Letter", value=letter))
+                            elif letter in self.letters["correct_letters"]:
+                                keyboard_row.append(html.BUTTON(letter, Class="correct button", Id="Letter", value=letter))
+                            else:
+                                keyboard_row.append(html.BUTTON(letter, Class="button", Id="Letter", value=letter))
+                        if n == len(self.alphabet) - 1:
+                            keyboard_row = [html.BUTTON("Enter", Class="button", Id="Enter", style="width: 60px;"),
+                            *keyboard_row, html.BUTTON("Backspace", Class="button", Id="Backspace", style="width: 100px;")]
+                        keyboard_rows.append(html.DIV(keyboard_row, Class="buttons row"))
+                    document <= html.DIV(keyboard_rows, Class="buttons rows")
+                    
+                    if self.error:
+                        document <= html.DIV(html.DIV(self.error, Class="error cell"), Class="appearence")
+                        timer.set_timeout(self.clean_error, 1500)
+                        
+                    if self.outcome:
+                        if self.outcome == self.outcomes["victory_outcome"]:
+                            document <= html.DIV(html.DIV(self.outcome, Class="victory cell"), Class="appearence")
+                        elif self.outcome == self.outcomes["lose_outcome"]:
+                            document <= html.DIV(html.DIV(self.outcome, Class="lose cell"), Class="appearence")
+
+                    document["Enter"].bind("click", self.enter_word)
+                    document["Backspace"].bind("click", self.remove_letter)
+                    for element in document.querySelectorAll("[id='Letter']"):
+                        element.bind("click", self.add_letter)
+                    
+                def add_letter(self, event):
+                    letter = event.target.value
+                    if not self.outcome:
+                        if len(self.guesses[-1]) < self.size:
+                            self.guesses = [g for g in self.guesses[:-1]] + [self.guesses[-1] + letter]
+                        else:
+                            self.error = self.errors["word_is_too_long_error"]
+                    self.spawn_page()
+                
+                def check_word(self):
+                    if self.guesses[-1] == self.hidden_word:
+                        self.outcome = self.outcomes["victory_outcome"]
+                    elif len(self.guesses) == self.tries and len(self.guesses[-1]) == self.size:
+                        self.outcome = self.outcomes["lose_outcome"]
+                    for n, letter in enumerate(self.guesses[-1]):
+                        if letter == self.hidden_word[n]:
+                            if letter not in self.letters["correct_letters"]:
+                                self.letters["correct_letters"].append(letter)
+                            if letter in self.letters["partially_correct_letters"]:
+                                self.letters["partially_correct_letters"].remove(letter)
+                        elif letter in self.hidden_word:
+                            if letter not in self.letters["correct_letters"] \
+                                    and letter not in self.letters["partially_correct_letters"]:
+                                self.letters["partially_correct_letters"].append(letter)
+                        else:
+                            if letter not in self.letters["incorrect_letters"]:
+                                self.letters["incorrect_letters"].append(letter)
+                
+                def enter_word(self, event):
+                    if not self.outcome:
+                        if len(self.guesses[-1]) == self.size:
+                            if self.guesses[-1] in self.dictionary:
+                                self.check_word()
+                                self.guesses += [""]
+                            else:
+                                self.error = self.errors["no_word_in_dictionary_error"]
+                        else:
+                            self.error = self.errors["word_is_too_short_error"]
+                    self.spawn_page()
+                
+                def remove_letter(self, event):
+                    if not self.outcome:
+                        if self.guesses[-1]:
+                            self.guesses = [g for g in self.guesses[:-1]] + [self.guesses[-1][:-1]]
+                        else:
+                            self.error = self.errors["nothing_to_delete_error"]
+                    self.spawn_page()
+                
+                
+            wordle = Wordle("dictionary.csv", "alphabet.csv", 5, 6, "left_to_right", "Кажется, Вам нечего удалять", "К сожалению, такого слова нет в словаре", "Загаданое слово длиннее", "Загаданое слово короче", "Вам удалось отгадать загаданное слово. Перезагрузите страницу, чтобы получить новое слово", "Вам не удалось отгадать загаданное слово. Перезагрузите страницу, чтобы попробовать снова")
+		</script>
+	</body>
+</html>
