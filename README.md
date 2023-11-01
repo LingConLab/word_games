@@ -1,6 +1,6 @@
 # What is it?
 
-Python package for creating language games from your own data. It consists of a set of functions that render HTML files containing various games using existing templates and provided dictionaries.
+Python package for creating language games from your own data. It consists of a set of functions that render HTML files containing various games using existing HTML templates and provided dictionaries in csv format.
 
 # Installation
 
@@ -16,7 +16,7 @@ Import the function responsible for generating the game you need:\
 
 Call it and pass all the required arguments. For instance, Wordle requires a dictionary and a keyboard files, size of hidden words and, therefore, of all words that can be entered, number of tries player will have in game, direction of writing system of the game's language and finally some alerts texts:
 ```
-wordle(dictionary="dictionary.json", size=5, tries=6, alphabet="alphabet.json", direction="left_to_right",
+wordle(dictionary="dictionary.csv", size=5, tries=6, alphabet="alphabet.csv", direction="left_to_right",
        nothing_to_delete_error="Seems, you have nothing to delete",
        no_word_in_dictionary_error="There is no word to delete",
        word_is_too_short_error="Hidden word is longer", word_is_too_long_error="Hidden word is shorter",
@@ -30,6 +30,8 @@ Some of the requirements can be altered for different games, other such as dicti
 ```
 help(wordle)
 ```
+
+Detailed information about each specific function can be seen on [API](https://github.com/LingConLab/word_games/blob/main/API.MD)
 
 # License
 
