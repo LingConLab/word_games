@@ -132,4 +132,4 @@ Make sure you are putting correct path to your `.html` file in th `open()` state
 ### Wordle
 *примеры и гифки*
 ### Combiner
-*примеры и гифки*
+![](combiner_example.gif)
