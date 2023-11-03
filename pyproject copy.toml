@@ -1,0 +1,21 @@
+[project]
+name = "word_games"
+version = "1.0"
+authors = [
+  { name="HSE Linguistic Convergence Laboratory"},
+]
+description = "Framework for creating linguistic games with user provided data"
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/LingConLab/word_games"
+
+[build-system]
+requires = ['setuptools>=42']
+build-backend = 'setuptools.build_meta'
