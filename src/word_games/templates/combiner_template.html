@@ -118,7 +118,7 @@ class Combiner:
                 print("You won!")
                 return
             print(f"Yes! {len(self.solutions)} more")
-            document["wordCount"].attrs[text] <= f"{len(self.solutions)}/{self.base_solutions}"
+            document["wordCount"].text = f"{len(self.solutions)}/{self.base_solutions}"
             document["foundWords"] <= word + '\t'
             return True
         else:
